@@ -72,7 +72,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.StringVar(&url, "url", "https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png", "下载测速地址")
 	flag.Float64Var(&timeLimit, "tl", 9999, "平均延迟上限")
 	flag.Float64Var(&timeLimitLow, "tll", 0, "平均延迟下限")
-	flag.Float64Var(&speedLimit, "sl", 10, "下载速度下限")
+	flag.Float64Var(&speedLimit, "sl", 0, "下载速度下限")
 	flag.IntVar(&printResultNum, "p", 20, "显示结果数量")
 	flag.BoolVar(&disableDownload, "dd", false, "禁用下载测速")
 	flag.BoolVar(&ipv6Mode, "ipv6", false, "禁用下载测速")

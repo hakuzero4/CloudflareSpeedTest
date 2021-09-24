@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 )
-
+//go:embed ip.txt
+var chariptext string
 // 根据子网掩码获取主机数量
 func getCidrHostNum(maskLen int) int {
 	cidrIPNum := int(0)
@@ -55,12 +56,12 @@ func getIPSegRange(userSegIP, offset uint8) (uint8, uint8) {
 }
 
 func loadFirstIPOfRangeFromFile(ipFile string) []net.IPAddr {
-	file, err := os.Open(ipFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//file, err := os.Open(ipFile)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	firstIPs := make([]net.IPAddr, 0)
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(strings.NewReader(chariptext))
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		IPString := scanner.Text()

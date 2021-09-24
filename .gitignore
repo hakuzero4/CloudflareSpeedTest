@@ -1,2 +1,6 @@
 dist
 Releases
+.idea/
+config.yaml
+result.csv
+CloudflareSpeedTest

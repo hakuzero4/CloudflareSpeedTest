@@ -55,17 +55,22 @@ func (d *DnsPod) List() {
 }
 
 func (d *DnsPod) setRecordModify(ip string) {
-	val := d.format()
-	val.Set("mx", "0")
-	val.Set("record_id", d.config.GetString("dnspod.record_id"))
-	val.Set("record_type", "A")
-	val.Set("record_line", "境内")
-	val.Set("record_line_id", record_line)
-	val.Set("value", ip)
-	body := strings.NewReader(d.token() + val.Encode())
-	prefix := "Record.Modify"
-	d.do(prefix, body)
+	for k, v := range d.config.GetStringMapString("dnspod.record") {
+		val := d.format()
+		val.Set("mx", "0")
+		val.Set("record_id", v)
+		val.Set("sub_domain", k)
+		val.Set("record_type", "A")
+		val.Set("record_line", "境内")
+		val.Set("record_line_id", record_line)
+		val.Set("value", ip)
+		body := strings.NewReader(d.token() + val.Encode())
+		prefix := "Record.Modify"
+		d.do(prefix, body)
+	}
+
 }
+
 func init() {
 	dnspod.config = viper.New()
 	dnspod.config.SetConfigName("config")
