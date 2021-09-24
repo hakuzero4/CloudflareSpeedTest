@@ -16,7 +16,7 @@ import (
 )
 
 var version, ipFile, outputFile, versionNew string
-var disableDownload, ipv6Mode, allip bool
+var disableDownload, ipv6Mode, allip, dnspodRecordList bool
 var tcpPort, printResultNum, downloadSecond int
 var timeLimit, timeLimitLow, speedLimit float64
 
@@ -65,14 +65,14 @@ https://github.com/XIU2/CloudflareSpeedTest
 `
 
 	flag.IntVar(&pingRoutine, "n", 200, "测速线程数量")
-	flag.IntVar(&pingTime, "t", 4, "延迟测速次数")
+	flag.IntVar(&pingTime, "t", 10, "延迟测速次数")
 	flag.IntVar(&tcpPort, "tp", 443, "延迟测速端口")
 	flag.IntVar(&downloadTestCount, "dn", 20, "下载测速数量")
 	flag.IntVar(&downloadSecond, "dt", 10, "下载测速时间")
 	flag.StringVar(&url, "url", "https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png", "下载测速地址")
 	flag.Float64Var(&timeLimit, "tl", 9999, "平均延迟上限")
 	flag.Float64Var(&timeLimitLow, "tll", 0, "平均延迟下限")
-	flag.Float64Var(&speedLimit, "sl", 0, "下载速度下限")
+	flag.Float64Var(&speedLimit, "sl", 10, "下载速度下限")
 	flag.IntVar(&printResultNum, "p", 20, "显示结果数量")
 	flag.BoolVar(&disableDownload, "dd", false, "禁用下载测速")
 	flag.BoolVar(&ipv6Mode, "ipv6", false, "禁用下载测速")
@@ -80,7 +80,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.StringVar(&ipFile, "f", "ip.txt", "IP 数据文件")
 	flag.StringVar(&outputFile, "o", "result.csv", "输出结果文件")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
-
+	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
 	if printVersion {
@@ -129,6 +129,10 @@ https://github.com/XIU2/CloudflareSpeedTest
 	}
 	if outputFile == " " {
 		outputFile = ""
+	}
+	if dnspodRecordList {
+		dnspod.List()
+		os.Exit(0)
 	}
 }
 
@@ -229,6 +233,7 @@ func printResult(data []CloudflareIPData) {
 	if printResultNum > 0 { // 如果禁止直接输出结果就跳过
 		dateString := convertToString(data) // 转为多维数组 [][]String
 		if len(dateString) > 0 {            // IP数组长度(IP数量) 大于 0 时继续
+			dnspod.setRecordModify(dateString[0][0])
 			if len(dateString) < printResultNum { // 如果IP数组长度(IP数量) 小于  打印次数，则次数改为IP数量
 				printResultNum = len(dateString)
 			}
