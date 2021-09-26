@@ -4,3 +4,4 @@ Releases
 config.yaml
 result.csv
 CloudflareSpeedTest
+.goreleaser.yml
