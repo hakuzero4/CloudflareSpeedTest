@@ -71,11 +71,11 @@ func (d *DnsPod) setRecordModify(ip string) {
 
 }
 
-func init() {
+func loadConfig() {
 	dnspod.config = viper.New()
 	dnspod.config.SetConfigName("config")
 	dnspod.config.SetConfigType("yaml")
-	dnspod.config.AddConfigPath(".")
+	dnspod.config.AddConfigPath(config)
 	if err := dnspod.config.ReadInConfig(); err != nil {
 		panic(err)
 	}

@@ -15,7 +15,7 @@ import (
 	"github.com/cheggaaa/pb/v3"
 )
 
-var version, ipFile, outputFile, versionNew string
+var version, ipFile, outputFile, versionNew, config string
 var disableDownload, ipv6Mode, allip, dnspodRecordList bool
 var tcpPort, printResultNum, downloadSecond int
 var timeLimit, timeLimitLow, speedLimit float64
@@ -79,6 +79,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.BoolVar(&allip, "allip", false, "测速全部 IP")
 	flag.StringVar(&ipFile, "f", "ip.txt", "IP 数据文件")
 	flag.StringVar(&outputFile, "o", "result.csv", "输出结果文件")
+	flag.StringVar(&config, "c", ".", "配置文件")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
 	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
 	flag.Usage = func() { fmt.Print(help) }
@@ -134,6 +135,10 @@ https://github.com/XIU2/CloudflareSpeedTest
 		dnspod.List()
 		os.Exit(0)
 	}
+	if config == "" {
+		config = "."
+	}
+	loadConfig()
 }
 
 func main() {
