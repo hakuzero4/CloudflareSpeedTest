@@ -39,4 +39,7 @@ dnspod 记录ID获取方式
 
 因无法找到ip isp api顾不提供线路区分,默认为境内
 
+### changelog
+
+新增-c参数,指定config.ymal配置文件路径
 
