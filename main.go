@@ -84,6 +84,10 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
+	if config == "" {
+		config = "."
+	}
+	loadConfig()
 	if printVersion {
 		println(version)
 		fmt.Println("检查版本更新中...")
@@ -131,14 +135,12 @@ https://github.com/XIU2/CloudflareSpeedTest
 	if outputFile == " " {
 		outputFile = ""
 	}
+
 	if dnspodRecordList {
 		dnspod.List()
 		os.Exit(0)
 	}
-	if config == "" {
-		config = "."
-	}
-	loadConfig()
+
 }
 
 func main() {
