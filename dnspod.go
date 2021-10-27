@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"net/http"
 	url2 "net/url"
 	"strconv"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 // curl -X POST https://dnsapi.cn/Record.Line -d 'login_token=260196,1508ba5160d8647e0b3a660254c3eb2b&format=json&domain=999779.xyz'
@@ -21,7 +22,6 @@ type DnsPod struct {
 var dnspod = &DnsPod{}
 
 // 境内线路
-var record_line = "7=0"
 
 func (d *DnsPod) token() string {
 	return fmt.Sprintf("login_token=%s&", d.config.GetString("dnspod.id")+","+d.config.GetString("dnspod.token"))
@@ -61,7 +61,6 @@ func (d *DnsPod) setRecordModify(ip string) {
 		val.Set("record_id", v)
 		val.Set("sub_domain", k)
 		val.Set("record_type", "A")
-		val.Set("record_line", "境内")
 		val.Set("record_line_id", record_line)
 		val.Set("value", ip)
 		body := strings.NewReader(d.token() + val.Encode())

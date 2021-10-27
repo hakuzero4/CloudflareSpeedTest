@@ -15,7 +15,7 @@ import (
 	"github.com/cheggaaa/pb/v3"
 )
 
-var version, ipFile, outputFile, versionNew, config string
+var version, ipFile, outputFile, versionNew, config, record_line string
 var disableDownload, ipv6Mode, allip, dnspodRecordList bool
 var tcpPort, printResultNum, downloadSecond int
 var timeLimit, timeLimitLow, speedLimit float64
@@ -60,6 +60,10 @@ https://github.com/XIU2/CloudflareSpeedTest
         测速全部的IP；对 IP 段中的每个 IP (仅支持 IPv4) 进行测速；(默认 每个 IP 段随机测速一个 IP)
     -v
         打印程序版本+检查版本更新
+		-re
+				设置线路,不设置默认为境内(7=0)  10=0 电信  10=1 联通 10=3 移动
+		-dlist
+				获取dnspod记录
     -h
         打印帮助说明
 `
@@ -82,6 +86,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.StringVar(&config, "c", ".", "配置文件")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
 	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
+	flag.StringVar(&record_line, "re", "7=0", "选择设置线路")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
 	if config == "" {
