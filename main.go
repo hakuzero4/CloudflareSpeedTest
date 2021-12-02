@@ -1,6 +1,8 @@
 package main
 
 import (
+	"CloudflareSpeedTest/config"
+	"CloudflareSpeedTest/dns_server"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,14 +15,17 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
+	"github.com/spf13/viper"
 )
 
-var version, ipFile, outputFile, versionNew, config, record_line string
+var dnspod *dns_server.DnsPod
+var version, ipFile, outputFile, versionNew, cfp, record_line string
 var disableDownload, ipv6Mode, allip, dnspodRecordList bool
 var tcpPort, printResultNum, downloadSecond int
 var timeLimit, timeLimitLow, speedLimit float64
 
 func init() {
+	dnspod = dns_server.NewDnspod()
 	var printVersion bool
 	var help = `
 CloudflareSpeedTest ` + version + `
@@ -83,16 +88,27 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.BoolVar(&allip, "allip", false, "测速全部 IP")
 	flag.StringVar(&ipFile, "f", "ip.txt", "IP 数据文件")
 	flag.StringVar(&outputFile, "o", "result.csv", "输出结果文件")
-	flag.StringVar(&config, "c", ".", "配置文件")
+	flag.StringVar(&cfp, "c", ".", "配置文件路径")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
 	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
 	flag.StringVar(&record_line, "re", "7=0", "选择设置线路")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
-	if config == "" {
-		config = "."
+	if cfp == "" {
+		cfp = "."
 	}
-	loadConfig()
+
+	if err := config.Init(cfp); err != nil {
+		fmt.Print("读取配置文件出错")
+		panic(1)
+	}
+
+	if viper.Get("dnspod") != nil {
+		fmt.Println("%+v", viper.Get("dnspod"))
+	} else {
+		fmt.Print("空")
+	}
+
 	if printVersion {
 		println(version)
 		fmt.Println("检查版本更新中...")
@@ -245,7 +261,8 @@ func printResult(data []CloudflareIPData) {
 	if printResultNum > 0 { // 如果禁止直接输出结果就跳过
 		dateString := convertToString(data) // 转为多维数组 [][]String
 		if len(dateString) > 0 {            // IP数组长度(IP数量) 大于 0 时继续
-			dnspod.setRecordModify(dateString[0][0])
+			dnspod.SetRecordModify(dateString[0][0])
+			// dnspod
 			if len(dateString) < printResultNum { // 如果IP数组长度(IP数量) 小于  打印次数，则次数改为IP数量
 				printResultNum = len(dateString)
 			}

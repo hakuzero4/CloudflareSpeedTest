@@ -6,3 +6,5 @@ result.csv
 CloudflareSpeedTest
 .goreleaser.yml
 *.exe
+
+*test.go

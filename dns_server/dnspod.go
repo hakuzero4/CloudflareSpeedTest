@@ -1,4 +1,4 @@
-package main
+package dns_server
 
 import (
 	"bytes"
@@ -19,7 +19,10 @@ type DnsPod struct {
 	config *viper.Viper
 }
 
-var dnspod = &DnsPod{}
+func NewDnspod() *DnsPod {
+
+	return &DnsPod{}
+}
 
 // 境内线路
 
@@ -54,7 +57,11 @@ func (d *DnsPod) List() {
 	d.do(prefix, body)
 }
 
-func (d *DnsPod) setRecordModify(ip string) {
+func (d *DnsPod) SetRecordModify(ip string) {
+	record_line := d.config.GetString("record_line")
+	if record_line == "" {
+		record_line = "7=0"
+	}
 	for k, v := range d.config.GetStringMapString("dnspod.record") {
 		val := d.format()
 		val.Set("mx", "0")
@@ -68,16 +75,6 @@ func (d *DnsPod) setRecordModify(ip string) {
 		d.do(prefix, body)
 	}
 
-}
-
-func loadConfig() {
-	dnspod.config = viper.New()
-	dnspod.config.SetConfigName("config")
-	dnspod.config.SetConfigType("yaml")
-	dnspod.config.AddConfigPath(config)
-	if err := dnspod.config.ReadInConfig(); err != nil {
-		panic(err)
-	}
 }
 
 // unicode 转中文
