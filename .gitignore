@@ -1,5 +1,6 @@
 dist
 Releases
+<<<<<<< HEAD
 .idea/
 config.yaml
 result.csv
@@ -8,3 +9,7 @@ CloudflareSpeedTest
 *.exe
 
 *test.go
+=======
+*.exe
+*.csv
+>>>>>>> 533b140c9c6b6c88ae3acd77f506aa4852ac5033
