@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"CloudflareSpeedTest/dns_server"
+	"CloudflareSpeedTest/notify"
 	"encoding/csv"
 	"fmt"
 	"log"
@@ -8,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 const (
@@ -21,7 +25,12 @@ var (
 	InputMinDelay = minDelay
 	Output        = defaultOutput
 	PrintNum      = 10
+	dnspod        *dns_server.DnsPod
 )
+
+func init() {
+	dnspod = dns_server.NewDnspod()
+}
 
 // 是否打印测试结果
 func NoPrintResult() bool {
@@ -157,8 +166,18 @@ func (s DownloadSpeedSet) Print(ipv6 bool) {
 		dataFormat = "%-42s%-8s%-8s%-8s%-10s%-15s\n"
 	}
 	fmt.Printf(headFormat, "IP 地址", "已发送", "已接收", "丢包率", "平均延迟", "下载速度 (MB/s)")
+	dnspod.SetRecordModify(dateString[0][0])
 	for i := 0; i < PrintNum; i++ {
 		fmt.Printf(dataFormat, dateString[i][0], dateString[i][1], dateString[i][2], dateString[i][3], dateString[i][4], dateString[i][5])
+	}
+	txt := fmt.Sprintf("已选择最优ip%s, 速度为%s", dateString[0][0], dateString[0][5])
+	if viper.GetString("wechat.webhook") != "" {
+		dd := notify.NewWechatMsg(viper.GetString("wechat.webhook"))
+		dd.SendMsg(txt)
+	}
+	if viper.GetString("dingding.token") != "" {
+		wx := notify.NewDingDingNotify(viper.GetString("dingding.token"), viper.GetString("dingding.secret"))
+		wx.SendMsg(txt)
 	}
 	if !noOutput() {
 		fmt.Printf("\n完整测速结果已写入 %v 文件，可使用记事本/表格软件查看。\n", Output)

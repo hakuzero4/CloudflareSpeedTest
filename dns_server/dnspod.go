@@ -27,7 +27,7 @@ func NewDnspod() *DnsPod {
 // 境内线路
 
 func (d *DnsPod) token() string {
-	return fmt.Sprintf("login_token=%s&", d.config.GetString("dnspod.id")+","+d.config.GetString("dnspod.token"))
+	return fmt.Sprintf("login_token=%s&", viper.GetString("dnspod.id")+","+viper.GetString("dnspod.token"))
 }
 func (d *DnsPod) do(prefix string, body io.Reader) {
 	req, err := http.NewRequest("POST", "https://dnsapi.cn/"+prefix, body)
@@ -47,7 +47,7 @@ func (d *DnsPod) do(prefix string, body io.Reader) {
 func (d *DnsPod) format() url2.Values {
 	params := url2.Values{}
 	params.Add("format", "json")
-	params.Add("domain", d.config.GetString("dnspod.domain"))
+	params.Add("domain", viper.GetString("dnspod.domain"))
 	return params
 }
 
@@ -58,11 +58,11 @@ func (d *DnsPod) List() {
 }
 
 func (d *DnsPod) SetRecordModify(ip string) {
-	record_line := d.config.GetString("record_line")
+	record_line := viper.GetString("record_line")
 	if record_line == "" {
 		record_line = "7=0"
 	}
-	for k, v := range d.config.GetStringMapString("dnspod.record") {
+	for k, v := range viper.GetStringMapString("dnspod.record") {
 		val := d.format()
 		val.Set("mx", "0")
 		val.Set("record_id", v)

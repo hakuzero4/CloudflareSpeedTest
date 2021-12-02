@@ -2,16 +2,19 @@ package task
 
 import (
 	"bufio"
+	_ "embed"
 	"log"
 	"math/rand"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 )
 
 const defaultInputFile = "ip.txt"
+
+//go:embed ip.txt
+var chariptext string
 
 var (
 	// IPv6 IP version is 6
@@ -137,16 +140,16 @@ func (r *IPRanges) chooseIPv6() {
 }
 
 func loadIPRanges() []*net.IPAddr {
-	if IPFile == "" {
-		IPFile = defaultInputFile
-	}
-	file, err := os.Open(IPFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	// if IPFile == "" {
+	// 	IPFile = defaultInputFile
+	// }
+	// file, err := os.Open(IPFile)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer file.Close()
 	ranges := newIPRanges()
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(strings.NewReader(chariptext))
 	for scanner.Scan() {
 		ranges.parseCIDR(scanner.Text())
 		if IPv6 {
