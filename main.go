@@ -85,6 +85,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
 	flag.StringVar(&record_line, "re", "7=0", "选择设置线路")
 	flag.StringVar(&cfp, "c", ".", "配置文件路径")
+	flag.BoolVar(&utils.Location, "loc", false, "本地模式最后一段输出最优ip")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
 	if cfp == "" {
@@ -108,14 +109,14 @@ https://github.com/XIU2/CloudflareSpeedTest
 	task.Timeout = time.Duration(downloadTime) * time.Second
 
 	if printVersion {
-		println(version)
-		fmt.Println("检查版本更新中...")
-		checkUpdate()
-		if versionNew != "" {
-			fmt.Printf("*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***", versionNew)
-		} else {
-			fmt.Println("当前为最新版本 [" + version + "]！")
-		}
+		// println(version)
+		// fmt.Println("检查版本更新中...")
+		// checkUpdate()
+		// if versionNew != "" {
+		// 	fmt.Printf("*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***", versionNew)
+		// } else {
+		// 	fmt.Println("当前为最新版本 [" + version + "]！")
+		// }
 		os.Exit(0)
 	}
 }
@@ -133,9 +134,9 @@ func main() {
 	utils.ExportCsv(speedData)
 	speedData.Print(task.IPv6)
 
-	if versionNew != "" {
-		fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
-	}
+	// if versionNew != "" {
+	// fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
+	// }
 	endPrint()
 }
 
