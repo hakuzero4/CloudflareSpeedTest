@@ -172,6 +172,7 @@ func (s DownloadSpeedSet) Print(ipv6 bool) {
 	}
 	txt := fmt.Sprintf("已选择最优ip%s, 速度为%s", dateString[0][0], dateString[0][5])
 	if viper.GetString("wechat.webhook") != "" {
+
 		dd := notify.NewWechatMsg(viper.GetString("wechat.webhook"))
 		dd.SendMsg(txt)
 	}
