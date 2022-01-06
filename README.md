@@ -6,23 +6,24 @@
 [![GitHub Star](https://img.shields.io/github/stars/XIU2/CloudflareSpeedTest.svg?style=flat-square&label=Star&color=00ADD8&logo=github)](https://github.com/XIU2/CloudflareSpeedTest/)
 [![GitHub Fork](https://img.shields.io/github/forks/XIU2/CloudflareSpeedTest.svg?style=flat-square&label=Fork&color=00ADD8&logo=github)](https://github.com/XIU2/CloudflareSpeedTest/)
 
-## 使用说明
+国外很多网站都在使用 Cloudflare CDN，但分配给中国内地访客的 IP 并不友好（延迟高、丢包多、速度慢）。  
+虽然 Cloudflare 公开了所有 [IP 段](https://www.cloudflare.com/ips/) ，但想要在这么多 IP 中找到适合自己的，怕是要累死，于是就有了这个软件。  
 
-需要在执行文件目录新增config.yaml文件
+**「自选优选 IP」测试 Cloudflare CDN 延迟和速度，获取最快 IP (IPv4+IPv6)**！好用的话**点个`⭐`鼓励一下叭~**  
 
 > _分享我其他开源项目：[**TrackersList.com** - 全网热门 BT Tracker 列表！有效提高 BT 下载速度~](https://github.com/XIU2/TrackersListCollection) <img src="https://img.shields.io/github/stars/XIU2/TrackersListCollection.svg?style=flat-square&label=Star&color=4285dd&logo=github" height="16px" />_   
 > _[**UserScript** - 🐵 Github 高速下载、知乎增强、自动无缝翻页、护眼模式 等十几个**油猴脚本**！](https://github.com/XIU2/UserScript)<img src="https://img.shields.io/github/stars/XIU2/UserScript.svg?style=flat-square&label=Star&color=4285dd&logo=github" height="16px" />_   
 
 ****
-## 快速使用
+## \# 快速使用
 
 ### 下载运行
 
-1. 下载编译好的可执行文件 [蓝奏云](https://pan.lanzoui.com/b0742hkxe) / [Github](https://github.com/XIU2/CloudflareSpeedTest/releases) 并解压。  
-2. 双击运行 `CloudflareST.exe`文件（Windows），等待测速完成...  
+1. 下载编译好的可执行文件 [蓝奏云](https://pan.lanzouo.com/b0742hkxe) / [Github](https://github.com/XIU2/CloudflareSpeedTest/releases) 并解压。  
+2. 双击运行 `CloudflareST.exe` 文件（Windows 系统），等待测速完成...  
 
 <details>
-<summary><code><strong>「 点击查看 Linux 下载运行命令示例 」</strong></code></summary>
+<summary><code><strong>「 点击查看 Linux 系统下的使用示例 」</strong></code></summary>
 
 ****
 
@@ -35,8 +36,9 @@ mkdir CloudflareST
 # 进入文件夹（后续更新，只需要从这里重复下面的下载、解压命令即可）
 cd CloudflareST
 
-# 下载 CloudflareST 压缩包（自行根据需求替换 URL 中版本号和文件名）
-wget -N https://github.com/XIU2/CloudflareSpeedTest/releases/download/v1.5.0/CloudflareST_linux_amd64.tar.gz
+# 下载 CloudflareST 压缩包（自行根据需求替换 URL 中 [版本号] 和 [文件名]）
+wget -N https://github.com/XIU2/CloudflareSpeedTest/releases/download/v2.0.2/CloudflareST_linux_amd64.tar.gz
+# 注意！国内下载时，建议把 URL 中的 github.com 替换为 download.fastgit.org (镜像站) 以避免下载失败
 
 # 解压（不需要删除旧文件，会直接覆盖，自行根据需求替换 文件名）
 tar -zxf CloudflareST_linux_amd64.tar.gz
@@ -44,8 +46,11 @@ tar -zxf CloudflareST_linux_amd64.tar.gz
 # 赋予执行权限
 chmod +x CloudflareST
 
-# 运行
+# 运行（不带参数）
 ./CloudflareST
+
+# 运行（带参数示例）
+./CloudflareST -dd -tll 90
 ```
 
 > 如果平**均延迟非常低**（如 0.xx），则说明 CloudflareST **测速时走了代理**，请先关闭代理软件后再测速。  
@@ -55,7 +60,7 @@ chmod +x CloudflareST
 
 ****
 
-> [_**在 Android 手机上运行 CloudflareST 测速的简单教程 ...**_](https://github.com/XIU2/CloudflareSpeedTest/discussions/61)  
+> _在**手机**上独立运行 CloudflareST 测速的简单教程：**[Android](https://github.com/XIU2/CloudflareSpeedTest/discussions/61)、[IOS](https://github.com/XIU2/CloudflareSpeedTest/issues/151)**_  
 > _**建议测速时避开晚上高峰期（20:00~24:00）**，否则测速结果会与其他时间**相差很大...**_  
 
 ### 结果示例
@@ -77,9 +82,11 @@ IP 地址           已发送  已接收  丢包率  平均延迟  下载速度 
 ...
 
 # 如果平均延迟非常低（如 0.xx），则说明 CloudflareST 测速时走了代理，请先关闭代理软件后再测速。
+# 如果延迟很低 (几十ms)，且你也不是移动 (香港直连)，那么你就是遇到假墙 IP 了，记得加上 -tll 参数。
 # 如果在路由器上运行（如 OpenWrt），请先关闭路由器内的代理，否则测速结果会不准确且无法使用。
 
 # 因为默认下载测速地址的文件大小只有 300MB，如果你速度太快的话，测速结果可能会低于实际速度。
+# 官方 500MB (可自定义大小) 下载测速地址：https://speed.cloudflare.com/__down?bytes=500000000
 # 因为每次测速都是在每个 IP 段中随机 IP，所以每次的测速结果都不可能相同，这是正常的！
 
 # 软件是先 延迟测速并按从低到高排序后，再从 最低延迟的 IP 开始下载测速的，所以：
@@ -97,7 +104,7 @@ IP 地址, 已发送, 已接收, 丢包率, 平均延迟, 下载速度 (MB/s)
 > _大家可以按自己需求，对完整结果**进一步筛选处理**，或者去看一看进阶使用**指定过滤条件**！_
 
 ****
-## 进阶使用
+## \# 进阶使用
 
 直接运行使用的是默认参数，如果想要测速结果更全面、更符合自己的要求，可以自定义参数。  
 
@@ -112,23 +119,24 @@ https://github.com/XIU2/CloudflareSpeedTest
     -n 200
         测速线程数量；越多测速越快，性能弱的设备 (如路由器) 请勿太高；(默认 200 最多 1000)
     -t 4
-        延迟测速次数；单个 IP 延迟测速次数，为 1 时将过滤丢包的IP，TCP协议；(默认 4)
+        延迟测速次数；单个 IP 延迟测速次数，为 1 时将过滤丢包的IP，TCP协议；(默认 4 次)
     -tp 443
-        指定测速端口；延迟测速/下载测速时使用的端口；(默认 443)
+        指定测速端口；延迟测速/下载测速时使用的端口；(默认 443 端口)
     -dn 10
-        下载测速数量；延迟测速并排序后，从最低延迟起下载测速的数量；(默认 10)
+        下载测速数量；延迟测速并排序后，从最低延迟起下载测速的数量；(默认 10 个)
     -dt 10
-        下载测速时间；单个 IP 下载测速最长时间，单位：秒；(默认 10)
-    -url https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png
-        下载测速地址；用来下载测速的 Cloudflare CDN 文件地址，如地址含有空格请加上引号；
+        下载测速时间；单个 IP 下载测速最长时间，不能太短；(默认 10 秒)
+    -url https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png (默认 300MB)
+    -url https://speed.cloudflare.com/__down?bytes=500000000 (官方 500MB 且可自定义大小)
+        下载测速地址；用来下载测速的 Cloudflare CDN 文件地址，文件太小可能导致测速结果不准确；
     -tl 200
         平均延迟上限；只输出低于指定平均延迟的 IP，可与其他上限/下限搭配；(默认 9999 ms)
     -tll 40
-        平均延迟下限；只输出高于指定平均延迟的 IP，可与其他上限/下限搭配、过滤被假蔷的 IP；(默认 0 ms)
+        平均延迟下限；只输出高于指定平均延迟的 IP，可与其他上限/下限搭配、过滤假墙 IP；(默认 0 ms)
     -sl 5
         下载速度下限；只输出高于指定下载速度的 IP，凑够指定数量 [-dn] 才会停止测速；(默认 0.00 MB/s)
     -p 10
-        显示结果数量；测速后直接显示指定数量的结果，为 0 时不显示结果直接退出；(默认 10)
+        显示结果数量；测速后直接显示指定数量的结果，为 0 时不显示结果直接退出；(默认 10 个)
     -f ip.txt
         IP段数据文件；如路径含有空格请加上引号；支持其他 CDN IP段；(默认 ip.txt)
     -o result.csv
@@ -164,6 +172,10 @@ CloudflareST.exe -f ipv6.txt -ipv6
 ****
 #### \# 文件相对/绝对路径
 
+<details>
+<summary><code><strong>「 点击展开 查看内容 」</strong></code></summary>
+
+****
 ``` bash
 # 指定 IPv4 数据文件，不显示结果直接退出，输出结果到文件（-p 值为 0）
 CloudflareST.exe -f 1.txt -p 0 -dd
@@ -174,18 +186,24 @@ CloudflareST.exe -f 2.txt -o "" -p 10 -dd
 # 指定 IPv4 数据文件 及 输出结果到文件（相对路径，即当前目录下，如含空格请加上引号）
 CloudflareST.exe -f 3.txt -o result.txt -dd
 
+
 # 指定 IPv4 数据文件 及 输出结果到文件（相对路径，即当前目录内的 abc 文件夹下，如含空格请加上引号）
 # Linux（CloudflareST 程序所在目录内的 abc 文件夹下）
 ./CloudflareST -f abc/3.txt -o abc/result.txt -dd
+
 # Windows（注意是反斜杠）
 CloudflareST.exe -f abc\3.txt -o abc\result.txt -dd
+
 
 # 指定 IPv4 数据文件 及 输出结果到文件（绝对路径，即 C:\abc\ 目录下，如含空格请加上引号）
 # Linux（/abc/ 目录下）
 ./CloudflareST -f /abc/4.txt -o /abc/result.csv -dd
+
 # Windows（注意是反斜杠）
 CloudflareST.exe -f C:\abc\4.txt -o C:\abc\result.csv -dd
 ```
+</details>
+
 ****
 #### \# 自定义下载测速地址
 
@@ -193,7 +211,7 @@ CloudflareST.exe -f C:\abc\4.txt -o C:\abc\result.csv -dd
 # 地址要求：可以直接下载、文件大小超过 200MB、用的是 Cloudflare CDN
 CloudflareST.exe -url https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png
 # 因为默认下载测速地址的文件大小只有 300MB，如果你速度太快的话，测速结果可能会低于实际速度。
-# 因此也可以使用 Cloudflare CDN 官方的下载测速地址（500MB）：
+# 因此推荐使用 Cloudflare CDN 官方下载测速地址（500MB 且可自定义大小，即末尾数字）：
 CloudflareST.exe -url https://speed.cloudflare.com/__down?bytes=500000000
 
 # 注意：如果下载测速地址为 HTTP 协议，记得加上 -tp 80（这个参数会影响 延迟测速/下载测速 时使用的端口）

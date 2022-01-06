@@ -1,8 +1,6 @@
 package main
 
 import (
-	"CloudflareSpeedTest/config"
-	"CloudflareSpeedTest/dns_server"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -16,13 +14,10 @@ import (
 )
 
 var (
-	version, versionNew, record_line, cfp string
-	dnspodRecordList                      bool
-	dnspod                                *dns_server.DnsPod
+	version, versionNew string
 )
 
 func init() {
-	dnspod = dns_server.NewDnspod()
 	var printVersion bool
 	var help = `
 CloudflareSpeedTest ` + version + `
@@ -33,23 +28,24 @@ https://github.com/XIU2/CloudflareSpeedTest
     -n 200
         测速线程数量；越多测速越快，性能弱的设备 (如路由器) 请勿太高；(默认 200 最多 1000)
     -t 4
-        延迟测速次数；单个 IP 延迟测速次数，为 1 时将过滤丢包的IP，TCP协议；(默认 4)
+        延迟测速次数；单个 IP 延迟测速次数，为 1 时将过滤丢包的IP，TCP协议；(默认 4 次)
     -tp 443
-        指定测速端口；延迟测速/下载测速时使用的端口；(默认 443)
+        指定测速端口；延迟测速/下载测速时使用的端口；(默认 443 端口)
     -dn 10
-        下载测速数量；延迟测速并排序后，从最低延迟起下载测速的数量；(默认 10)
+        下载测速数量；延迟测速并排序后，从最低延迟起下载测速的数量；(默认 10 个)
     -dt 10
-        下载测速时间；单个 IP 下载测速最长时间，单位：秒；(默认 10)
-    -url https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png
-        下载测速地址；用来下载测速的 Cloudflare CDN 文件地址，如地址含有空格请加上引号；
+        下载测速时间；单个 IP 下载测速最长时间，不能太短；(默认 10 秒)
+    -url https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png  (默认 300MB)
+    -url https://speed.cloudflare.com/__down?bytes=500000000 (官方 500MB 且可自定义大小)
+        下载测速地址；用来下载测速的 Cloudflare CDN 文件地址，文件太小可能导致测速结果不准确；
     -tl 200
         平均延迟上限；只输出低于指定平均延迟的 IP，可与其他上限/下限搭配；(默认 9999 ms)
     -tll 40
-        平均延迟下限；只输出高于指定平均延迟的 IP，可与其他上限/下限搭配、过滤被假蔷的 IP；(默认 0 ms)
+        平均延迟下限；只输出高于指定平均延迟的 IP，可与其他上限/下限搭配、过滤假墙 IP；(默认 0 ms)
     -sl 5
         下载速度下限；只输出高于指定下载速度的 IP，凑够指定数量 [-dn] 才会停止测速；(默认 0.00 MB/s)
     -p 10
-        显示结果数量；测速后直接显示指定数量的结果，为 0 时不显示结果直接退出；(默认 10)
+        显示结果数量；测速后直接显示指定数量的结果，为 0 时不显示结果直接退出；(默认 10 个)
     -f ip.txt
         IP段数据文件；如路径含有空格请加上引号；支持其他 CDN IP段；(默认 ip.txt)
     -o result.csv
@@ -82,24 +78,8 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.IntVar(&utils.PrintNum, "p", 10, "显示结果数量")
 	flag.StringVar(&utils.Output, "o", "result.csv", "输出结果文件")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
-	flag.BoolVar(&dnspodRecordList, "dlist", false, "获取dnspod记录列表")
-	flag.StringVar(&record_line, "re", "7=0", "选择设置线路")
-	flag.StringVar(&cfp, "c", ".", "配置文件路径")
-	flag.BoolVar(&utils.Location, "loc", false, "本地模式最后一段输出最优ip")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
-	if cfp == "" {
-		cfp = "."
-	}
-
-	if err := config.Init(cfp); err != nil {
-		fmt.Print("读取配置文件出错")
-		panic(1)
-	}
-	if dnspodRecordList {
-		dnspod.List()
-		os.Exit(0)
-	}
 
 	if task.MinSpeed > 0 && time.Duration(maxDelay)*time.Millisecond == utils.InputMaxDelay {
 		fmt.Println("[小提示] 在使用 [-sl] 参数时，建议搭配 [-tl] 参数，以避免因凑不够 [-dn] 数量而一直测速...")
@@ -109,14 +89,14 @@ https://github.com/XIU2/CloudflareSpeedTest
 	task.Timeout = time.Duration(downloadTime) * time.Second
 
 	if printVersion {
-		// println(version)
-		// fmt.Println("检查版本更新中...")
-		// checkUpdate()
-		// if versionNew != "" {
-		// 	fmt.Printf("*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***", versionNew)
-		// } else {
-		// 	fmt.Println("当前为最新版本 [" + version + "]！")
-		// }
+		println(version)
+		fmt.Println("检查版本更新中...")
+		checkUpdate()
+		if versionNew != "" {
+			fmt.Printf("*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***", versionNew)
+		} else {
+			fmt.Println("当前为最新版本 [" + version + "]！")
+		}
 		os.Exit(0)
 	}
 }
@@ -134,9 +114,9 @@ func main() {
 	utils.ExportCsv(speedData)
 	speedData.Print(task.IPv6)
 
-	// if versionNew != "" {
-	// fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
-	// }
+	if versionNew != "" {
+		fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
+	}
 	endPrint()
 }
 
