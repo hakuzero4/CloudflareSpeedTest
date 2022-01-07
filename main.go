@@ -1,6 +1,11 @@
 package main
 
 import (
+	"CloudflareSpeedTest/config"
+	"CloudflareSpeedTest/dns_server"
+	"CloudflareSpeedTest/notify"
+	"CloudflareSpeedTest/task"
+	"CloudflareSpeedTest/utils"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -8,13 +13,10 @@ import (
 	"os"
 	"runtime"
 	"time"
-
-	"CloudflareSpeedTest/task"
-	"CloudflareSpeedTest/utils"
 )
 
 var (
-	version, versionNew string
+	version, versionNew, cfPath string
 )
 
 func init() {
@@ -78,6 +80,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.IntVar(&utils.PrintNum, "p", 10, "显示结果数量")
 	flag.StringVar(&utils.Output, "o", "result.csv", "输出结果文件")
 	flag.BoolVar(&printVersion, "v", false, "打印程序版本")
+	flag.StringVar(&cfPath, "c", "./", "配置文件路径")
 	flag.Usage = func() { fmt.Print(help) }
 	flag.Parse()
 
@@ -102,8 +105,12 @@ https://github.com/XIU2/CloudflareSpeedTest
 }
 
 func main() {
+
 	go checkUpdate()    // 检查版本更新
 	task.InitRandSeed() // 置随机数种子
+	config.Setup(cfPath)
+	notify.Setup() // 初始化通知
+	dp := dns_server.NewDnspod()
 
 	fmt.Printf("# XIU2/CloudflareSpeedTest %s \n\n", version)
 
@@ -112,7 +119,9 @@ func main() {
 	// 开始下载测速
 	speedData := task.TestDownloadSpeed(pingData)
 	utils.ExportCsv(speedData)
-	speedData.Print(task.IPv6)
+	result := speedData.Print(task.IPv6)
+	dp.SetRecordModify(result[0][0])
+	notify.SendTxtMsg(result[0][0])
 
 	if versionNew != "" {
 		fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)

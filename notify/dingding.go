@@ -13,14 +13,11 @@ import (
 	"time"
 )
 
+var _ iNotify = (*Dingding)(nil)
+
 type Dingding struct {
 	token, secret string
-}
-type DingdingMsgBody struct {
-	Msgtype string `json:"msgtype"`
-	Text    struct {
-		Content string `json:"content"`
-	} `json:"text"`
+	resErr        *responError
 }
 
 func sign(t int64, secret string) string {
@@ -31,11 +28,8 @@ func sign(t int64, secret string) string {
 	return base64.StdEncoding.EncodeToString(data)
 }
 
-func (d *Dingding) SendMsg(txt string) error {
-	msg := &DingdingMsgBody{Msgtype: "text", Text: struct {
-		Content string "json:\"content\""
-	}{txt}}
-	m, _ := json.Marshal(msg)
+func (d *Dingding) SendMsg(content interface{}) error {
+	m, _ := json.Marshal(content)
 	value := url.Values{}
 	value.Set("access_token", d.token)
 	if d.secret != "" {
@@ -56,6 +50,13 @@ func (d *Dingding) SendMsg(txt string) error {
 	}
 	defer res.Body.Close()
 	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	if err := d.resErr.check(b); err != nil {
+		return err
+	}
+
 	if res.StatusCode != http.StatusOK {
 		fmt.Printf("消息发送失败%s", b)
 	}
@@ -66,5 +67,6 @@ func NewDingDingNotify(token, secret string) *Dingding {
 	return &Dingding{
 		token:  token,
 		secret: secret,
+		resErr: &responError{},
 	}
 }
