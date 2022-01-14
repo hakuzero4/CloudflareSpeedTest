@@ -1,9 +1,6 @@
 package main
 
 import (
-	"CloudflareSpeedTest/config"
-	"CloudflareSpeedTest/dns_server"
-	"CloudflareSpeedTest/notify"
 	"CloudflareSpeedTest/task"
 	"CloudflareSpeedTest/utils"
 	"flag"
@@ -11,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"runtime"
 	"time"
 )
 
@@ -71,7 +67,7 @@ https://github.com/XIU2/CloudflareSpeedTest
 	flag.IntVar(&minDelay, "tll", 0, "平均延迟下限")
 	flag.IntVar(&downloadTime, "dt", 10, "下载测速时间")
 	flag.IntVar(&task.TestCount, "dn", 10, "下载测速数量")
-	flag.StringVar(&task.URL, "url", "https://cf.xiu2.xyz/Github/CloudflareSpeedTest.png", "下载测速地址")
+	flag.StringVar(&task.URL, "url", "https://speed.cloudflare.com/__down?bytes=500000000", "下载测速地址")
 	flag.BoolVar(&task.Disable, "dd", false, "禁用下载测速")
 	flag.BoolVar(&task.IPv6, "ipv6", false, "启用IPv6")
 	flag.BoolVar(&task.TestAll, "allip", false, "测速全部 IP")
@@ -106,38 +102,27 @@ https://github.com/XIU2/CloudflareSpeedTest
 
 func main() {
 
-	go checkUpdate()    // 检查版本更新
-	task.InitRandSeed() // 置随机数种子
-	config.Setup(cfPath)
-	notify.Setup() // 初始化通知
-	dp := dns_server.NewDnspod()
+	// back up
+	// go checkUpdate()    // 检查版本更新
+	// task.InitRandSeed() // 置随机数种子
+	// config.Setup(cfPath)
+	// notify.Setup() // 初始化通知
+	// dp := dns_server.NewDnspod()
 
-	fmt.Printf("# XIU2/CloudflareSpeedTest %s \n\n", version)
+	// fmt.Printf("# XIU2/CloudflareSpeedTest %s \n\n", version)
 
-	// 开始延迟测速
-	pingData := task.NewPing().Run().FilterDelay()
-	// 开始下载测速
-	speedData := task.TestDownloadSpeed(pingData)
-	utils.ExportCsv(speedData)
-	result := speedData.Print(task.IPv6)
-	dp.SetRecordModify(result[0][0])
-	notify.SendTxtMsg(result[0][0])
+	// // 开始延迟测速
+	// pingData := task.NewPing().Run().FilterDelay()
+	// // 开始下载测速
+	// speedData := task.TestDownloadSpeed(pingData)
+	// utils.ExportCsv(speedData)
+	// result := speedData.Print(task.IPv6)
+	// dp.SetRecordModify(result[0][0])
+	// notify.SendTxtMsg(result[0][0])
 
-	if versionNew != "" {
-		fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
-	}
-	endPrint()
-}
-
-func endPrint() {
-	if utils.NoPrintResult() {
-		return
-	}
-	if runtime.GOOS == "windows" { // 如果是 Windows 系统，则需要按下 回车键 或 Ctrl+C 退出（避免通过双击运行时，测速完毕后直接关闭）
-		fmt.Printf("按下 回车键 或 Ctrl+C 退出。")
-		var pause int
-		fmt.Scanln(&pause)
-	}
+	// if versionNew != "" {
+	// 	fmt.Printf("\n*** 发现新版本 [%s]！请前往 [https://github.com/XIU2/CloudflareSpeedTest] 更新！ ***\n", versionNew)
+	// }
 }
 
 // 检查更新

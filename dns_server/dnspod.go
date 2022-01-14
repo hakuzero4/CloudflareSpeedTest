@@ -60,14 +60,13 @@ func (d *DnsPod) List() {
 }
 
 func (d *DnsPod) SetRecordModify(ip string) {
-	record_line := recordLineFor()
 	for k, v := range config.C.Dnspod.Record {
 		val := d.format()
 		val.Set("mx", "0")
 		val.Set("record_id", strconv.Itoa(v))
 		val.Set("sub_domain", k)
 		val.Set("record_type", "A")
-		val.Set("record_line_id", record_line)
+		val.Set("record_line_id", recordLineFor())
 		val.Set("value", ip)
 		body := strings.NewReader(d.token() + val.Encode())
 		prefix := "Record.Modify"
